@@ -1,0 +1,15 @@
+doctype html
+html
+    head
+        title = "Simplified Media Center: Playing"
+    body
+        p Howdy!
+
+        p #{video_path}
+        
+        ul
+            li
+                a(href='/' + p_path) ..
+
+        video(controls)
+            source(src=video_path, type="video/mp4")
