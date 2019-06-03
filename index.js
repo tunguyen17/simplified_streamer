@@ -1,5 +1,6 @@
 //Import packages
 const fs = require('fs');
+require('dotenv').config()
 
 // Initialize
 const app = require('express')();

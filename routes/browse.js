@@ -17,21 +17,17 @@ router.get('/', function(req, res, next) {
     //next();
 });
 
-
 router.get('/:path*', function(req, res){
     
+    console.log(req.headers.range);
+
     // Parsing path list
     var path_lst = req.path.split('/');
     path_lst = path_lst.filter(x => x !== ''); 
 
-    console.log(path_lst);
-    
     var path = path_lst.join('/');
     var p_path = './browse/' + path + '/..'; 
-    console.log(p_path); 
 	var full_url =  req.protocol + '://' + req.get("Host") + req.path;
-
-	console.log(full_url);
 
     if(fs.lstatSync(path).isDirectory()){
         // Read dir when path is a folder
