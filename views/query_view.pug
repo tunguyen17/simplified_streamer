@@ -1,0 +1,13 @@
+doctype html
+html
+    head
+        title = "Query View"
+    body
+        p Howdy!
+
+        p #{search_query}
+
+        ul
+            each path, name in query_res
+                li
+                    a(href='/' + path) #{name}

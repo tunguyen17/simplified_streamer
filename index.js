@@ -10,6 +10,7 @@ const io = require('socket.io')(http);
 // video route
 var video = require('./routes/video');
 var browse = require('./routes/browse');
+var database = require('./routes/database');
 
 app.set('view engine', 'pug');
 app.set('views','./views');
@@ -27,5 +28,6 @@ app.get('/', function(req, res){
 
 app.use('/video', video);
 app.use('/browse', browse);
+app.use('/database', database);
 
 app.listen(2030);

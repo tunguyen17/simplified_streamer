@@ -1,6 +1,13 @@
 CREATE TABLE movies(
-    id varchar(10) PRIMARY KEY,
-    title varchar(80),
-    genre varchar(50),
-    file_path varchar(200)
+    id INTEGER,
+    title VARCHAR(80),
+    genre VARCHAR(50),
+    file_path VARCHAR(200)
+);
+
+INSERT INTO movies VALUES(
+    0,
+    "tosh.0 sample",
+    "comedy",
+    "videos/sample.mp4" 
 );

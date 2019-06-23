@@ -1,0 +1,17 @@
+doctype html
+html
+    head
+        title = "Simplified Media Center"
+    body
+        p Howdy!
+
+        p #{dir_path}
+
+        ul.dir_lst
+            li
+                a(href='/' + p_path) ..
+        ul
+            each path, name in file_lst
+                li
+                    a(href='/' + path) #{name}
+
