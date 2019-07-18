@@ -11,7 +11,7 @@ router.get('/', function(req, res, next) {
     fs.readdir('.', (err, items) => {
         var data = {};
         items.map(x => data[x] = './browse/' + x);
-        res.render('first_view', {p_path: './browse', dir_path : './', file_lst : data});
+        res.render('index', {p_path: './browse', dir_path : './', file_lst : data});
     });
 
     //next();
@@ -34,7 +34,7 @@ router.get('/:path*', function(req, res){
         fs.readdir(path, (err, items) => {
             var data = {};
             items.map(x => data[x] = ( './browse/' + path + "/" + x));
-            res.render('first_view', {p_path : p_path, dir_path : path, file_lst : data});
+            res.render('index', {p_path : p_path, dir_path : path, file_lst : data});
         });
     } else {
         path = '/video/' + path;
