@@ -2,8 +2,6 @@ let fs      = require('fs')
 let path    = require('path');
 let express = require('express');
 
-
-
 // Function Def
 // REF: https://gist.github.com/padenot/1324734
 
@@ -25,7 +23,7 @@ function pipeWithRange(path, fileSize, range, request, response){
 	};
 	
 	response.writeHead(206, head); // code 206 partial content
-	content.pipe(response); // Piping the content to response
+	return content.pipe(response); // Piping the content to response
 }
 
 function pipeWithOutRange(path, fileSize, request, response){
@@ -37,7 +35,7 @@ function pipeWithOutRange(path, fileSize, request, response){
 	const content = fs.createReadStream(path);
     
     response.writeHead(200, head);
-    content.pipe(response);
+    return content.pipe(response);
 }
 
 /*
@@ -79,7 +77,7 @@ function readContent(path, request, response){
             toReturn = undefined;
         }
     });
-    console.log(toReturn);
+    //console.log(toReturn);
     return toReturn;
 }
 
@@ -87,13 +85,9 @@ let router  = express.Router();
 
 //	Stream the video
 
-router.get('/', function(req, res, next) {
-    res.render('video_view', {p_path : '.', video_path : '.'});
-});
-
 router.get('/:path*', function(req, res, next) {
     
-    console.log(req.headers.range)
+    //console.log(req.headers.range)
 
     // Parsing path list
     var path_lst = req.path.split('/');
@@ -101,39 +95,6 @@ router.get('/:path*', function(req, res, next) {
     var path = path_lst.join('/');
     readContent(path, req, res);
 
-    /*
-	const stat = fs.statSync(path)
-	const fileSize = stat.size
-	const range = req.headers.range
-    
-	if (range) {
-
-	  	const parts = range.replace(/bytes=/, "").split("-")
-	  	const start = parseInt(parts[0], 10)
-	  	const end = parts[1]
-	  	  ? parseInt(parts[1], 10)
-	  	  : fileSize-1
-	
-	  	const chunksize = (end-start)+1
-	  	const file = fs.createReadStream(path, {start, end})
-	  	const head = {
-	  	  'Content-Range': `bytes ${start}-${end}/${fileSize}`,
-	  	  'Accept-Ranges': 'bytes',
-	  	  'Content-Length': chunksize,
-	  	  'Content-Type': 'video/mp4',
-	  }
-	
-	  res.writeHead(206, head) // code 206 partial content
-	  file.pipe(res)
-	} else {
-	  const head = {
-	    'Content-Length': fileSize,
-	    'Content-Type': 'video/mp4',
-	  }
-	  res.writeHead(200, head)
-	  fs.createReadStream(path).pipe(res)
-	}
-    */
 });
 module.exports = router;
 

@@ -2,15 +2,22 @@
     <head>
         <title>Simplified Media Center</title>
     </head>
-
+    
+    <!--INCLUDING SOCKET IO-->
     <script src="/socket.io/socket.io.js"></script>
-
+    
     <script>
         var socket = io();
 
         var cur_dir = "";
 
         function change_dir(new_dir){
+            /*
+                Function to change the current direction
+
+                RETURN:
+                    - function to change the current direction to new_dir
+            */
             return function(){
 
                 if(new_dir !== '..'){
@@ -29,62 +36,23 @@
         }
         
         function load_dir(){
+
+            /*
+                Emit the load_dir signal to server
+            */
+
             socket.emit("load_dir", cur_dir);     
         }
-
+        
+        // Load directory when the page is loaded    
         window.onload = load_dir;
 
         function load_media(media_url){
+            // Load media with the url
             return function() {
                 socket.emit("load", media_url)
             };
         }
-    
-        function test(arg){
-            return function() {console.log("howdy test " + arg)};
-        }
-
-        socket.on("dir_data", function(data){
-            //console.log(data);
-
-                
-            var ul = document.getElementById("media_list");
-            ul.innerHTML = "";
-
-            if(cur_dir !== ''){
-                var li = document.createElement("li");
-                var media_button = document.createElement("button");
-                    
-                media_button.addEventListener('click', change_dir(".."));
-                
-                media_button.appendChild(document.createTextNode("Back"));
-                li.appendChild(media_button);
-                ul.appendChild(li);
-            } 
-
-            for (var key in data){
-                var li = document.createElement("li");
-                var media_button = document.createElement("button");
-                
-                if(data.hasOwnProperty(key)){
-                     
-                    if(data[key]){
-                        var new_dir = cur_dir + "/" + key;
-                        media_button.addEventListener('click', change_dir(new_dir));
-                    } else {
-                        var media_url = cur_dir + "/" + key;
-                        console.log(key);
-                        //media_button.onclick = load_media(media_url);
-                        media_button.addEventListener('click', load_media(media_url));
-                    }
-
-                    media_button.appendChild(document.createTextNode(key));
-                    li.appendChild(media_button);
-                    ul.appendChild(li);
-                }
-            }
-        });
-
 
         function search_submit(){
             var query = document.getElementById("search_text").value;
@@ -92,6 +60,51 @@
 
             socket.emit("query", query)
         }
+
+        socket.on("dir_data", function(data){
+            // when directory data is recieved
+
+            var ul = document.getElementById("media_list");
+            ul.innerHTML = "";
+            
+            // Create a back button when curr_dir is not on root
+                
+            var back_button = document.getElementById("back_button");
+
+            if(cur_dir !== ''){
+                back_button.addEventListener('click', change_dir(".."));
+                back_button.disabled = false;
+                back_button.style.background = 'red';
+            }else{
+                back_button.disabled = true;
+                back_button.style.background = 'grey';
+            } 
+            
+            // Create button elements from data
+            for (var key in data){
+                var li = document.createElement("li");
+                var media_button = document.createElement("button");
+                
+                if(data.hasOwnProperty(key)){
+                     
+                    if(data[key]){
+                        // when it is a folder
+                        var new_dir = cur_dir + "/" + key;
+                        media_button.addEventListener('click', change_dir(new_dir));
+                    } else {
+                        // When it is not a folder
+                        var media_url = cur_dir + "/" + key;
+                        //media_button.onclick = load_media(media_url);
+                        media_button.addEventListener('click', load_media(media_url));
+                    }
+                    
+                    // Add to stuff 
+                    media_button.appendChild(document.createTextNode(key));
+                    li.appendChild(media_button);
+                    ul.appendChild(li);
+                }
+            }
+        });
 
         socket.on("play", function(media_url){
             console.log(media_url);
@@ -111,14 +124,19 @@
             <button type="button" onclick="search_submit()">Search</button>
         </div>
 
-        <div id="media_list_container">
-            <ul id="media_list">
-            </ul>
-        </div>
         <div id="media_viewer_container">
-            <video id="play_viewer" controls autoplay width=200 heigh=500>
+            <video id="play_viewer" controls width=400 heigh=600>
                 <source id="source_viewer" src="/video/videos/sample.mp4" type="video/mp4">
             </video> 
+        </div>
+
+        <div id="media_list_container" style="width: 100%; height: 300px; overflow-y: scroll;">
+
+            <button id="back_button" style="background-color: #f44336;color: white;">Back</button>
+
+            <ul id="media_list">
+            </ul>
+
         </div>
     </body>
 </html>
