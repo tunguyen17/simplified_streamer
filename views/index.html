@@ -20,17 +20,10 @@
             */
             return function(){
 
-                if(new_dir !== '..'){
-                    var path_lst = new_dir.split('/');
-                    path_lst = path_lst.filter(x => x !== ''); 
-                    cur_dir = path_lst.join('/');
-                }else{
-                    var path_lst = cur_dir.split('/');
-                    path_lst = path_lst.filter(x => x !== ''); 
-                    path_lst.pop();
-                    cur_dir = path_lst.join('/');
-                }
-                
+                var path_lst = new_dir.split('/');
+                path_lst = path_lst.filter(x => x !== ''); 
+                cur_dir = path_lst.join('/');
+               
                 load_dir()
             }
         }
@@ -72,7 +65,12 @@
             var back_button = document.getElementById("back_button");
 
             if(cur_dir !== ''){
-                back_button.addEventListener('click', change_dir(".."));
+                var path_lst = cur_dir.split('/');
+                path_lst = path_lst.filter(x => x !== ''); 
+                path_lst.pop();
+                var new_dir = path_lst.join('/');
+
+                back_button.addEventListener('click', change_dir(new_dir));
                 back_button.disabled = false;
                 back_button.style.background = 'red';
             }else{

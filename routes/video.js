@@ -86,15 +86,15 @@ let router  = express.Router();
 //	Stream the video
 
 router.get('/:path*', function(req, res, next) {
-    
-    //console.log(req.headers.range)
 
     // Parsing path list
     var path_lst = req.path.split('/');
     path_lst = path_lst.filter(x => x !== ''); 
-    var path = path_lst.join('/');
+    var path = decodeURI(path_lst.join('/'));
     readContent(path, req, res);
+    //console.log(decodeURI(path));
 
+    req.io.on("load_dir", function(){console.log("Howdy", path)});
 });
 module.exports = router;
 

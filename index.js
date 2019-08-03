@@ -12,6 +12,12 @@ var video = require('./routes/video');
 var browse = require('./routes/browse');
 var database = require('./routes/database');
 
+// Make io accessible to our router
+app.use(function(req,res,next){
+    req.io = io;
+    next();
+});
+
 app.use('/video', video);
 app.use('/browse', browse);
 app.use('/database', database);
@@ -37,7 +43,7 @@ io.on('connection', function(socket){
     });
 
     socket.on('load_dir', function(client_dir){
-        console.log(client_dir);
+        //console.log(client_dir);
 
         var path = "videos/" + client_dir
           
