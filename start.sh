@@ -10,7 +10,7 @@ tmux has-session -t $SESSIONNAME &> /dev/null
 
 if [ $? != 0 ]
     then
-        tmux new-session -s $SESSIONNAME -n main -d  
+        tmux new-session -c ~/laptrinh/simplified_streamer -s $SESSIONNAME -n main -d  
 fi
 
 tmux attach -t $SESSIONNAME

@@ -1,13 +1,11 @@
 CREATE TABLE movies(
-    id INTEGER,
+    id INTEGER UNIQUE,
     title VARCHAR(80),
-    genre VARCHAR(50),
-    file_path VARCHAR(200)
+    file_path VARCHAR(200) NOT NULL
 );
 
 INSERT INTO movies VALUES(
     0,
     "tosh.0 sample",
-    "comedy",
     "videos/sample.mp4" 
 );

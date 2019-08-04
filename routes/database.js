@@ -52,13 +52,10 @@ function parseQuery(raw_query){
     return query_dict
 }
 
-router.get('/:query', function(req, res, next) {
+router.get('/', function(req, res, next) {
 
     //
     // query in the form title=TITLE&type=TYPE
-
-    let query_dict = parseQuery(req.params.query);
-
 
     let db = new sqlite3.Database('./database/media.db', sqlite3.OPEN_READWRITE, (err) => {
           if (err) {
@@ -67,7 +64,6 @@ router.get('/:query', function(req, res, next) {
           console.log('Connected to the media database.');
     });
 
-    softFindMedia(res, query_dict['title'], query_dict['type'],  db, render_callback);
     db.close();
 });
 

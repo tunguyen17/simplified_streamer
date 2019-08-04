@@ -39,11 +39,19 @@
         
         // Load directory when the page is loaded    
         window.onload = load_dir;
-
+        /*
         function load_media(media_url){
             // Load media with the url
             return function() {
                 socket.emit("load", media_url)
+            };
+        }
+        */
+
+        function load_with_id(id){
+            // Load media with the ud
+            return function() {
+                socket.emit("load_id", id)
             };
         }
 
@@ -53,62 +61,29 @@
 
             socket.emit("query", query)
         }
-
-        socket.on("dir_data", function(data){
-            // when directory data is recieved
-
+        
+        socket.on("query_res", function(rows){
             var ul = document.getElementById("media_list");
             ul.innerHTML = "";
             
-            // Create a back button when curr_dir is not on root
-                
-            var back_button = document.getElementById("back_button");
-
-            if(cur_dir !== ''){
-                var path_lst = cur_dir.split('/');
-                path_lst = path_lst.filter(x => x !== ''); 
-                path_lst.pop();
-                var new_dir = path_lst.join('/');
-
-                back_button.addEventListener('click', change_dir(new_dir));
-                back_button.disabled = false;
-                back_button.style.background = 'red';
-            }else{
-                back_button.disabled = true;
-                back_button.style.background = 'grey';
-            } 
-            
-            // Create button elements from data
-            for (var key in data){
+            rows.forEach(function(item){
+                // Creating button element
                 var li = document.createElement("li");
                 var media_button = document.createElement("button");
+                media_button.addEventListener('click', load_with_id(item.id));
                 
-                if(data.hasOwnProperty(key)){
-                     
-                    if(data[key]){
-                        // when it is a folder
-                        var new_dir = cur_dir + "/" + key;
-                        media_button.addEventListener('click', change_dir(new_dir));
-                    } else {
-                        // When it is not a folder
-                        var media_url = cur_dir + "/" + key;
-                        //media_button.onclick = load_media(media_url);
-                        media_button.addEventListener('click', load_media(media_url));
-                    }
-                    
-                    // Add to stuff 
-                    media_button.appendChild(document.createTextNode(key));
-                    li.appendChild(media_button);
-                    ul.appendChild(li);
-                }
-            }
+                // Add to stuff 
+                media_button.appendChild(document.createTextNode(item.title));
+                li.appendChild(media_button);
+                ul.appendChild(li);
+            });
+            // Create button elements from data
         });
 
         socket.on("play", function(media_url){
-            console.log(media_url);
+
             var viewer = document.getElementById("play_viewer");
-            var viewer_src = document.getElementById("source_viewer");
-            console.log(media_url);
+            var viewer_src = document.getElementById("viewer_source");
             viewer_src.src = media_url;
 
             viewer.load();
@@ -124,7 +99,7 @@
 
         <div id="media_viewer_container">
             <video id="play_viewer" controls width=400 heigh=600>
-                <source id="source_viewer" src="/video/videos/sample.mp4" type="video/mp4">
+                <source id="viewer_source" src="/video/0" type="video/mp4">
             </video> 
         </div>
 

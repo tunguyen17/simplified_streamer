@@ -85,16 +85,19 @@ let router  = express.Router();
 
 //	Stream the video
 
-router.get('/:path*', function(req, res, next) {
+router.get('/:id', function(req, res, next) {
 
-    // Parsing path list
-    var path_lst = req.path.split('/');
-    path_lst = path_lst.filter(x => x !== ''); 
-    var path = decodeURI(path_lst.join('/'));
-    readContent(path, req, res);
-    //console.log(decodeURI(path));
+    let sql = `SELECT file_path FROM movies WHERE id = ${req.params.id}`;
+    
+    query_promise = req.db.get(sql, [], (err, rows) => {
+        if(err){
+            throw err;
+        }
+        console.log(rows.file_path);
 
-    req.io.on("load_dir", function(){console.log("Howdy", path)});
+        readContent(rows.file_path, req, res);
+    });
 });
+
 module.exports = router;
 
