@@ -9,44 +9,41 @@
     <script>
         var socket = io();
 
-        var cur_dir = "";
-
-        function change_dir(new_dir){
-            /*
-                Function to change the current direction
-
-                RETURN:
-                    - function to change the current direction to new_dir
-            */
-            return function(){
-
-                var path_lst = new_dir.split('/');
-                path_lst = path_lst.filter(x => x !== ''); 
-                cur_dir = path_lst.join('/');
-               
-                load_dir()
-            }
-        }
-        
-        function load_dir(){
-
-            /*
-                Emit the load_dir signal to server
-            */
-
-            socket.emit("load_dir", cur_dir);     
-        }
-        
         // Load directory when the page is loaded    
-        window.onload = load_dir;
-        /*
-        function load_media(media_url){
-            // Load media with the url
-            return function() {
-                socket.emit("load", media_url)
-            };
+        window.onload = function(){
+			search_submit();
+            
+            // Search box
+		    document.getElementById("search_text")
+		        .addEventListener("keyup", function(event) {
+		        event.preventDefault();
+		        if (event.keyCode === 13) {
+		            document.getElementById("search_button").click();
+		        }
+		    });
+
+            // Full screen
+    
+		    let video = document.getElementById("play_viewer")
+		    document.addEventListener("keyup", function(event) {
+		        event.preventDefault();
+		        if (event.keyCode === 70) {
+
+                    try{
+		                video.mozRequestFullScreen();
+                    } catch(err){
+                        console.log(err);
+                    }
+
+                    try{
+                        video.webkitEnterFullScreen();
+                    } catch(err){
+                        console.log(err);
+                    }
+		        }
+		    });
+
         }
-        */
 
         function load_with_id(id){
             // Load media with the ud
@@ -85,27 +82,25 @@
             var viewer = document.getElementById("play_viewer");
             var viewer_src = document.getElementById("viewer_source");
             viewer_src.src = media_url;
-
+        
             viewer.load();
-        })
+        });
 
     </script>
 
     <body>
-        <div id="search_bar">
-            <input type="text" id="search_text" placeholder="howdy">
-            <button type="button" onclick="search_submit()">Search</button>
-        </div>
-
         <div id="media_viewer_container">
             <video id="play_viewer" controls width=400 heigh=600>
                 <source id="viewer_source" src="/video/0" type="video/mp4">
             </video> 
         </div>
 
-        <div id="media_list_container" style="width: 100%; height: 300px; overflow-y: scroll;">
+        <div id="search_bar">
+            <input type="text" id="search_text" placeholder="howdy">
+            <button type="button" id="search_button" onclick="search_submit()">Search</button>
+        </div>
 
-            <button id="back_button" style="background-color: #f44336;color: white;">Back</button>
+        <div id="media_list_container" style="width: 100%; height: 300px; overflow-y: scroll;">
 
             <ul id="media_list">
             </ul>

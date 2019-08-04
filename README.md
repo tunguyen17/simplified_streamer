@@ -47,6 +47,10 @@ or
 
 ffprobe -v error -show_format -show_streams a.mp4
 
+ffmpeg -i input.avi -c:v libx264 -crf 23 -c:a aac -movflags faststart output.mp4
+
 # Scratch area
 
 Video router to a id tag instead of file path, look up on database and get the file path
+
+Add tv series using folder and pattern matching
