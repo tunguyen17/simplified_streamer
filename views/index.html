@@ -1,6 +1,7 @@
 <html>
     <head>
         <title>Simplified Media Center</title>
+        <link rel="stylesheet" type="text/css" href="index_style.css">
     </head>
     
     <!--INCLUDING SOCKET IO-->
@@ -8,103 +9,210 @@
     
     <script>
         var socket = io();
+        var text_input_focused = false;        
 
         // Load directory when the page is loaded    
         window.onload = function(){
+
+            // Initialize and propangate search result
 			search_submit();
-            
+
+            // Add search text listerner for enter key
             // Search box
-		    document.getElementById("search_text")
-		        .addEventListener("keyup", function(event) {
+		    search_text.addEventListener("keyup", function(event) {
 		        event.preventDefault();
 		        if (event.keyCode === 13) {
 		            document.getElementById("search_button").click();
 		        }
 		    });
 
-            // Full screen
-    
-		    let video = document.getElementById("play_viewer")
+		    let media_player = document.getElementById("media_player");
+            // Add fullscreen ability by pressing f and menu ability | issue: conflict with text box (fixed)
+
 		    document.addEventListener("keyup", function(event) {
 		        event.preventDefault();
-		        if (event.keyCode === 70) {
+                
 
-                    try{
-		                video.mozRequestFullScreen();
-                    } catch(err){
-                        console.log(err);
-                    }
+                // also check document.activeElement.tagName
+                text_input_focused = event.target.matches('input, textarea');
+                // m_keyCode is 77 | toggle menu
+		        if (event.keyCode === 77 && !text_input_focused) {
+                    toggle_menu();
+                }
+                
+                // space_keyCode is 70 | toggle fullscreen
+		        if (event.keyCode === 70 && !text_input_focused) {
+                    if(!document.mozFullScreen && !document.webkitIsFullScreen){
+                        try{
+		                    media_player.mozRequestFullScreen();
+                        } catch(err){
+                            console.log(err);
+                        }
 
-                    try{
-                        video.webkitEnterFullScreen();
-                    } catch(err){
-                        console.log(err);
+                        try{
+                            media_player.webkitEnterFullScreen();
+                        } catch(err){
+                            console.log(err);
+                        }
+
+                        media_player.focus();
+                    } else {
+                        try{
+		                    document.mozCancelFullScreen();
+                        } catch(err){
+                            console.log(err);
+                        }
+
+                        try{
+                            document.webkitExitFullScreen();
+                        } catch(err){
+                            console.log(err);
+                        }
+
                     }
 		        }
-		    });
-
+            });
         }
 
-        function load_with_id(id){
-            // Load media with the ud
+        function load_with_id(id, title = "Howdy"){
+            // Load media with the id
             return function() {
+                document.getElementById("media_title").innerHTML = title;
                 socket.emit("load_id", id)
             };
         }
 
-        function search_submit(){
-            var query = document.getElementById("search_text").value;
-            console.log(query);
+        function edit_with_id(id){
+            // edit media with the id - form is pop up 
+            return function() {
+                document.getElementById("edit_popup").style.display = "block";
 
-            socket.emit("query", query)
+                document.getElementById("media_meta_edit").innerHTML = `{"id":${id}, "db":"movies"}`;
+                
+                socket.emit("edit_id", id)
+            };
+        }
+
+        function cancel_edit(){
+            // cancel edit form disappear
+            document.getElementById("edit_popup").style.display = "none";
+            document.getElementById("media_meta_edit").innerHTML = `{"id":"","db":""}`;
+        }
+
+        function submit_edit(){
+            // submit edit 
+            var media_meta_edit = JSON.parse(document.getElementById("media_meta_edit").innerHTML);
+            media_meta_edit["title"] = document.getElementById("media_title_edit").value;
+
+            console.log(media_meta_edit);
+
+            socket.emit("edit_query_req", media_meta_edit);
+
+            document.getElementById("edit_popup").style.display = "none";
+            
+            search_submit();
+        }
+
+        function toggle_menu(){
+            // toggle menu that show search results
+            let menu_container = document.getElementById("menu_container");
+            let menu_status = document.getElementById("menu_status");
+           
+            if(menu_container.style.display === "none"){ 
+                menu_container.style.display = "block";
+                menu_status.innerHTML = "&darr;";
+            }else{
+                menu_container.style.display = "none";
+                menu_status.innerHTML = "&uarr;";
+            }
+        }
+        
+
+        socket.on("req_err", function(err){
+            // when there is an error
+            console.log(`Request Error: ${err}`); 
+        });
+
+        socket.on("edit_query_res", function(rows){
+            document.getElementById("media_title_edit").value = rows.title;
+        });
+
+        function search_submit(){
+            // submit the search query
+            var query = document.getElementById("search_text").value;
+
+            socket.emit("query", query);
         }
         
         socket.on("query_res", function(rows){
+            // when the result of a query arrive
             var ul = document.getElementById("media_list");
             ul.innerHTML = "";
             
             rows.forEach(function(item){
                 // Creating button element
                 var li = document.createElement("li");
+
+                var edit_media_button = document.createElement("button");
+                edit_media_button.addEventListener('click', edit_with_id(item.id));
+                edit_media_button.appendChild(document.createTextNode("Edit"));
+                li.appendChild(edit_media_button);
+
                 var media_button = document.createElement("button");
-                media_button.addEventListener('click', load_with_id(item.id));
-                
-                // Add to stuff 
+                media_button.addEventListener('click', load_with_id(item.id, item.title));
                 media_button.appendChild(document.createTextNode(item.title));
                 li.appendChild(media_button);
+                
+                // Add to stuff 
                 ul.appendChild(li);
             });
             // Create button elements from data
         });
 
         socket.on("play", function(media_url){
-
-            var viewer = document.getElementById("play_viewer");
+            //GOHERE
             var viewer_src = document.getElementById("viewer_source");
             viewer_src.src = media_url;
-        
-            viewer.load();
+
+            media_player.focus();
+            media_player.load();
         });
 
     </script>
 
     <body>
+
+        <button id="menu_button" onclick="toggle_menu()">Menu <span id="menu_status">&darr;</span></button>
+        
+        <div id="menu_container">
+            <div id="search_bar">
+                <input type="text" id="search_text" placeholder="howdy" class="text_input">
+                <button type="button" id="search_button" onclick="search_submit()">Search</button>
+            </div>
+            
+            <div id="edit_popup">
+                <span id="media_meta_edit"></span><br>
+
+                <label for="media_title_edit">Title</label>
+                <input type="text" id="media_title_edit" placeholder="howdy" value="" name="media_title_edit" class="text_input"> <br>
+
+                <button type="button" id="submit_eidt" onclick="submit_edit()">Submit</button>
+                <button type="button" id="cancel_edit" onclick="cancel_edit()">Cancel</button>
+            </div>
+
+            <div id="media_list_container">
+
+                <ul id="media_list">
+                </ul>
+
+            </div>
+        </div>
+
         <div id="media_viewer_container">
-            <video id="play_viewer" controls width=400 heigh=600>
+            <video id="media_player" controls width=60%>
                 <source id="viewer_source" src="/video/0" type="video/mp4">
             </video> 
-        </div>
-
-        <div id="search_bar">
-            <input type="text" id="search_text" placeholder="howdy">
-            <button type="button" id="search_button" onclick="search_submit()">Search</button>
-        </div>
-
-        <div id="media_list_container" style="width: 100%; height: 300px; overflow-y: scroll;">
-
-            <ul id="media_list">
-            </ul>
-
+            <h3 id="media_title">Howdy</h3>
         </div>
     </body>
 </html>

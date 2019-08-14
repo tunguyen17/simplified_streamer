@@ -1,0 +1,44 @@
+#media_viewer_container{
+    width:100%;
+    text-align:center;
+}
+
+#media_list_container{
+    width: 100%;
+    height: 90%;
+    overflow-y: scroll;
+}
+
+#edit_popup{
+	display: none;
+	position: fixed;
+	bottom: 50%;
+	right: 50%;
+	border: 3px solid #f1f1f1;
+    background-color:rgba(200, 200, 200, 0.8);
+	z-index: 9;
+}
+
+#menu_button{
+	opacity: 0.3;
+    position:fixed;
+    top:10px;
+    left:10px;
+}
+
+#menu_button:hover{
+	opacity: 0.8;
+}
+
+#menu_container{
+	display: block;
+    position:fixed;
+	border: 3px solid #f1f1f1;
+    width : 80%;
+    height : 80%;
+    top:50px;
+    left:10px;
+    background-color:rgba(200, 200, 200, 0.8);
+	z-index: 8;
+}
+

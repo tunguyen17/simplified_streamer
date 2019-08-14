@@ -15,6 +15,10 @@ var database = require('./routes/database');
 
 var db;
 
+app.use('/index_style.css', function(req, res){
+        res.sendFile(__dirname + '/views/index_style.css'); 
+});
+
 // Make io accessible to our router
 app.use(function(req,res,next){
     req.db = db;
@@ -48,6 +52,31 @@ io.on('connection', function(socket){
         io.to(socket.id).emit("play", path);
     });
 
+    socket.on('edit_id', function(media_id){
+
+        let sql = `SELECT id, title FROM movies WHERE id = ${media_id}`;
+
+        db.get(sql, [], (err, rows) => {
+            if(err){
+                throw err;
+            }
+
+            io.to(socket.id).emit("edit_query_res", rows);
+
+        });
+    });
+
+    socket.on('edit_query_req', function(media_meta_edit){
+
+        let sql = `UPDATE ${media_meta_edit.db} SET title = "${media_meta_edit.title}" WHERE id = ${media_meta_edit.id}`;
+
+        db.run(sql, [], (err) => {
+            if(err){
+                io.to(socket.id).emit("req_err", "Update row failed");
+                throw err;
+            } 
+        });
+    });
 
     socket.on('query', function(query){
         console.log("Query ", query);

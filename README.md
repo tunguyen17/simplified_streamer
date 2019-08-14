@@ -54,3 +54,5 @@ ffmpeg -i input.avi -c:v libx264 -crf 23 -c:a aac -movflags faststart output.mp4
 Video router to a id tag instead of file path, look up on database and get the file path
 
 Add tv series using folder and pattern matching
+
+If video_player is focused, change the background for its container
