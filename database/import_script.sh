@@ -3,15 +3,18 @@
 
 shopt -s globstar
 
-DIRPATH="../videos"
+MOVIE_DIRPATH="../media/video/movie"
+SERIES_DIRPATH="../media/video/series"
 
 I=1
 
-for i in $DIRPATH/**/*.mp4; do
+for i in $MOVIE_DIRPATH/*; do
     I=$((I+1))
-    FILEPATH="$(echo $i | cut -d'/' -f2-)"
-    FILENAME="$(basename "$i")"
-    echo "$I,\"$FILENAME\",\"$FILEPATH\"" >> tmp_db.csv
+    FILEPATH="$(echo $i | cut -d'/' -f5-)"
+    
+    echo $FILEPATH
+    #FILENAME="$(basename "$i")"
+    #echo "$I,\"$FILENAME\",\"$FILEPATH\"" # >> tmp_db.csv
 done
 
-echo -e ".separator ","\n.import tmp_db.csv movies" | sqlite3 media.db
+# echo -e ".separator ","\n.import tmp_db.csv movies" | sqlite3 media.db

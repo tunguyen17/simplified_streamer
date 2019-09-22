@@ -35,11 +35,11 @@
 
                 // also check document.activeElement.tagName
                 text_input_focused = event.target.matches('input, textarea');
-                // m_keyCode is 77 | toggle menu
-		        if (event.keyCode === 77 && !text_input_focused) {
+                // esc is 27 | toggle menu
+		        if (event.keyCode === 27) {
                     toggle_menu();
                 }
-                
+
                 // space_keyCode is 70 | toggle fullscreen
 		        if (event.keyCode === 70 && !text_input_focused) {
                     if(!document.mozFullScreen && !document.webkitIsFullScreen){
@@ -121,9 +121,12 @@
             if(menu_container.style.display === "none"){ 
                 menu_container.style.display = "block";
                 menu_status.innerHTML = "&darr;";
+                document.getElementById("search_text").focus();
+
             }else{
                 menu_container.style.display = "none";
                 menu_status.innerHTML = "&uarr;";
+                media_player.focus();
             }
         }
         
@@ -210,7 +213,7 @@
 
         <div id="media_viewer_container">
             <video id="media_player" controls width=60%>
-                <source id="viewer_source" src="/video/0" type="video/mp4">
+                <source id="viewer_source" src="/video/1" type="video/mp4">
             </video> 
             <h3 id="media_title">Howdy</h3>
         </div>

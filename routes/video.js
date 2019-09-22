@@ -1,7 +1,9 @@
 let fs      = require('fs')
 let path    = require('path');
 let express = require('express');
+let router  = express.Router();
 
+//
 // Function Def
 // REF: https://gist.github.com/padenot/1324734
 
@@ -81,7 +83,6 @@ function readContent(path, request, response){
     return toReturn;
 }
 
-let router  = express.Router();
 
 //	Stream the video
 
@@ -93,9 +94,11 @@ router.get('/:id', function(req, res, next) {
         if(err){
             throw err;
         }
-        console.log(rows.file_path);
+            
 
-        readContent(rows.file_path, req, res);
+        test_path = rows.file_path
+        console.log(test_path);
+        readContent(test_path, req, res);
     });
 });
 

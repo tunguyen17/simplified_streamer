@@ -10,27 +10,29 @@ const sqlite3 = require('sqlite3').verbose();
 
 // video route
 var video = require('./routes/video');
-var browse = require('./routes/browse');
-var database = require('./routes/database');
+var import_media = require('./routes/import_media')();
 
 var db;
 
+// setting global root file
+global.__basedir = __dirname;
+
 app.use('/index_style.css', function(req, res){
-        res.sendFile(__dirname + '/views/index_style.css'); 
+        res.sendFile(__basedir + '/views/index_style.css'); 
 });
 
 // Make io accessible to our router
 app.use(function(req,res,next){
     req.db = db;
+    req.io = io;
     next();
 });
 
 app.use('/video', video);
-app.use('/browse', browse);
-app.use('/database', database);
+app.use('/import_media', import_media);
 
 app.get('/', function(req, res){
-    res.sendFile(__dirname + '/views/index.html');
+    res.sendFile(__basedir + '/views/index.html');
 });
 
 // socket communication

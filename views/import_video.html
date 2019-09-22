@@ -1,0 +1,25 @@
+<html>
+    <head>
+        <title>Simplified Media Center: import video</title>
+    </head>
+    
+    <!--INCLUDING SOCKET IO-->
+    <script src="/socket.io/socket.io.js"></script>
+     
+    <script>
+        var socket = io();
+        window.onload = function(){
+            // script
+        }
+
+        socket.on('test', (msg) => console.log(msg) );
+
+    </script>
+
+    <body>
+        <div id="media_list_container">
+            <ul id="media_list">
+            </ul>
+        </div>
+    </body>
+</html>
