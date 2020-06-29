@@ -1,1 +1,1 @@
-sqlite3 media.db -init schema.sql
+sqlite3 media.db -init schema.sql 

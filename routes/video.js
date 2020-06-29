@@ -86,19 +86,28 @@ function readContent(path, request, response){
 
 //	Stream the video
 
-router.get('/:id', function(req, res, next) {
+router.get('/:media_type/:id', function(req, res, next) {
 
-    let sql = `SELECT file_path FROM movies WHERE id = ${req.params.id}`;
+    let media_type = req.params.media_type;
+
+    let db = media_type==="movies"?"movies":"series_detail";
+
+    let sql = `SELECT file_path FROM ${db} WHERE id = ${req.params.id}`;
     
     query_promise = req.db.get(sql, [], (err, rows) => {
         if(err){
             throw err;
         }
-            
-
-        test_path = rows.file_path
-        console.log(test_path);
-        readContent(test_path, req, res);
+        
+        if (typeof rows === 'undefined'){
+            console.log('ID not found');
+            res.writeHead(404);
+            res.end("<h1>404, not found.</h1>")
+        } else {
+            video_path = rows.file_path;
+            console.log(`local video path: ${video_path}`);
+            readContent(video_path, req, res);
+        }
     });
 });
 

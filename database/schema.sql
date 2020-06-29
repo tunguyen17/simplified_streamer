@@ -6,9 +6,13 @@ CREATE TABLE movies(
 
 CREATE TABLE series(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title VARCHAR(80)
+);
+
+CREATE TABLE series_detail(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    series_id INTEGER,
     title VARCHAR(80),
-    series_title VARCHAR(80),
-    episode INTEGER,
-    season INTEGER,
-    file_path VARCHAR(200) NOT NULL
+    file_path VARCHAR(200) NOT NULL,
+    play_order INTEGER
 );

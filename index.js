@@ -49,9 +49,22 @@ io.on('connection', function(socket){
         io.to(socket.id).emit("query_res", rows);
 	}); 
 
-    socket.on('load_id', function(media_id){
-        var path = "/video/" + media_id;
+    socket.on('load_id', function(load_data){
+        var path = `/video/${load_data.media_type}/${load_data.id}`;
         io.to(socket.id).emit("play", path);
+    });
+
+    socket.on('load_series_season', function(series_id){
+        //GOHERE1
+        let sql = `SELECT id, title FROM series_detail where series_id=${series_id}`;
+
+	    db.all(sql, [], (err, rows) => {
+	        if (err) {
+	            throw err;
+	        }
+
+            io.to(socket.id).emit("query_res", rows);
+        });
     });
 
     socket.on('edit_id', function(media_id){
@@ -81,9 +94,12 @@ io.on('connection', function(socket){
     });
 
     socket.on('query', function(query){
-        console.log("Query ", query);
+        console.log(query.media_type);
 
-        let sql = `SELECT id, title FROM movies where title LIKE '%${query}%'`;
+        var media_type = query.media_type;
+        var search_text = query.search_text;
+
+        let sql = `SELECT id, title FROM ${media_type} where title LIKE '%${search_text}%'`;
 
 	    db.all(sql, [], (err, rows) => {
 	        if (err) {

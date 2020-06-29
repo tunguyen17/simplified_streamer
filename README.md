@@ -56,3 +56,8 @@ Video router to a id tag instead of file path, look up on database and get the f
 Add tv series using folder and pattern matching
 
 If video_player is focused, change the background for its container
+
+# batch proces
+
+ls | sort -nt'(' -k2
+sort -V
