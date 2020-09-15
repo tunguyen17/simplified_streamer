@@ -42,3 +42,8 @@
 	z-index: 8;
 }
 
+#player_controller{
+    display: block;
+    text-align: center;
+    padding: 10px;
+}

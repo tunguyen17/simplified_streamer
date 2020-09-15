@@ -7,197 +7,7 @@
     <!--INCLUDING SOCKET IO-->
     <script src="/socket.io/socket.io.js"></script>
     
-    <script>
-        var socket = io();
-        var text_input_focused = false;        
-
-        // Load directory when the page is loaded    
-        window.onload = function(){
-
-            // Initialize and propangate search result
-			search_submit();
-
-            // Add search text listerner for enter key
-            // Search box
-		    search_text.addEventListener("keyup", function(event) {
-		        event.preventDefault();
-		        if (event.keyCode === 13) {
-		            document.getElementById("search_button").click();
-		        }
-		    });
-
-		    let media_player = document.getElementById("media_player");
-            // Add fullscreen ability by pressing f and menu ability | issue: conflict with text box (fixed)
-
-		    document.addEventListener("keyup", function(event) {
-		        event.preventDefault();
-                
-
-                // also check document.activeElement.tagName
-                text_input_focused = event.target.matches('input, textarea');
-                // esc is 27 | toggle menu
-		        if (event.keyCode === 27) {
-                    toggle_menu();
-                }
-
-                // space_keyCode is 70 | toggle fullscreen
-		        if (event.keyCode === 70 && !text_input_focused) {
-                    if(!document.mozFullScreen && !document.webkitIsFullScreen){
-                        try{
-		                    media_player.mozRequestFullScreen();
-                        } catch(err){
-                            console.log(err);
-                        }
-
-                        try{
-                            media_player.webkitEnterFullScreen();
-                        } catch(err){
-                            console.log(err);
-                        }
-
-                        media_player.focus();
-                    } else {
-                        try{
-		                    document.mozCancelFullScreen();
-                        } catch(err){
-                            console.log(err);
-                        }
-
-                        try{
-                            document.webkitExitFullScreen();
-                        } catch(err){
-                            console.log(err);
-                        }
-
-                    }
-		        }
-            });
-        }
-
-        function load_with_id(id, title = "Howdy"){
-            // Load media with the id
-            return function() {
-                document.getElementById("media_title").innerHTML = title;
-                var media_type = document.getElementById("media_type").value;
-                var load_data = {"media_type":media_type, "id":id}
-                if(media_type === "series"){
-                    if(document.getElementById("title_info").innerHTML === ""){
-                        console.log(document.getElementById("title_info").innerHTML);
-                        socket.emit("load_series_season", id);
-                        document.getElementById("title_info").innerHTML = title;
-                    } else {
-                        socket.emit("load_id", load_data);
-                    }
-                } else {
-                    document.getElementById("title_info").innerHTML = title;
-                    socket.emit("load_id", load_data);
-                }
-            };
-        }
-
-        function edit_with_id(id){
-            // edit media with the id - form is pop up 
-            return function() {
-                document.getElementById("edit_popup").style.display = "block";
-
-                document.getElementById("media_meta_edit").innerHTML = `{"id":${id}, "db":"movies"}`;
-                
-                socket.emit("edit_id", id)
-            };
-        }
-
-        function cancel_edit(){
-            // cancel edit form disappear
-            document.getElementById("edit_popup").style.display = "none";
-            document.getElementById("media_meta_edit").innerHTML = `{"id":"","db":""}`;
-        }
-
-        function submit_edit(){
-            // submit edit 
-            var media_meta_edit = JSON.parse(document.getElementById("media_meta_edit").innerHTML);
-            media_meta_edit["title"] = document.getElementById("media_title_edit").value;
-
-            console.log(media_meta_edit);
-
-            socket.emit("edit_query_req", media_meta_edit);
-
-            document.getElementById("edit_popup").style.display = "none";
-            
-            search_submit();
-        }
-
-        function toggle_menu(){
-            // toggle menu that show search results
-            let menu_container = document.getElementById("menu_container");
-            let menu_status = document.getElementById("menu_status");
-           
-            if(menu_container.style.display === "none"){ 
-                menu_container.style.display = "block";
-                menu_status.innerHTML = "&darr;";
-                document.getElementById("search_text").focus();
-
-            }else{
-                menu_container.style.display = "none";
-                menu_status.innerHTML = "&uarr;";
-                media_player.focus();
-            }
-        }
-        
-
-        socket.on("req_err", function(err){
-            // when there is an error
-            console.log(`Request Error: ${err}`); 
-        });
-
-        socket.on("edit_query_res", function(rows){
-            document.getElementById("media_title_edit").value = rows.title;
-        });
-
-        function search_submit(){
-            // submit the search query
-            var search_text = document.getElementById("search_text").value;
-            var media_type = document.getElementById("media_type").value;
-            document.getElementById("media_type_info").innerHTML = media_type;
-            var query = {'media_type':media_type, 'search_text': search_text};
-            socket.emit("query", query);
-        }
-        
-        socket.on("query_res", function(rows){
-            // when the result of a query arrive
-            var ul = document.getElementById("media_list");
-            var series_title = document.getElementById("media_list").innerHTML;
-            ul.innerHTML = "";
-            
-            rows.forEach(function(item){
-                // Creating button element
-                var li = document.createElement("li");
-
-                var edit_media_button = document.createElement("button");
-                edit_media_button.addEventListener('click', edit_with_id(item.id));
-                edit_media_button.appendChild(document.createTextNode("Edit"));
-                li.appendChild(edit_media_button);
-
-                var media_button = document.createElement("button");
-                media_button.addEventListener('click', load_with_id(item.id, item.title));
-                media_button.appendChild(document.createTextNode(item.title));
-                li.appendChild(media_button);
-                
-                // Add to stuff 
-                ul.appendChild(li);
-            });
-            // Create button elements from data
-        });
-
-        socket.on("play", function(media_url){
-            //GOHERE
-            var viewer_src = document.getElementById("viewer_source");
-            viewer_src.src = media_url;
-
-            media_player.focus();
-            media_player.load();
-        });
-
-    </script>
+    <script src="script.js"></script>
 
     <body>
 
@@ -212,14 +22,6 @@
                 </select>
                 <button type="button" id="search_button" onclick="search_submit()">Search</button>
             </div>
-
-            <div id="media_detail">
-                <span id="title_info"></span><br>
-                <span id="episode_title_info"></span><br>
-                <span id="media_type_info"></span><br>
-                <span id="series_season_info"></span><br>
-                <span id="series_episode_info"></span>
-            </div>
             
             <div id="edit_popup">
                 <span id="media_meta_edit"></span><br>
@@ -232,19 +34,38 @@
             </div>
 
             <div id="media_list_container">
-
                 <ul id="media_list">
                 </ul>
 
+                <ul id="seasons_list">
+                </ul>
+
+                <ul id="episodes_list">
+                </ul>
             </div>
+        </div>
+        <br>
+        <div id="player_controller">
+                <button type="button" id="play_previous" onclick="play_previous()">Previous</button>
+                <button type="button" id="play_next" onclick="play_next()">Next</button> <br>
+                Autoplay <input type="checkbox" id="autoplay"> 
         </div>
 
         <div id="media_viewer_container">
-            <video id="media_player" controls width=60%>
+            <video id="media_player" controls autoplay width=60%>
                 <source id="viewer_source" src="/video/1" type="video/mp4">
                 <source id="viewer_source" src="/video/1" type="video/ogg">
             </video> 
             <h3 id="media_title">Howdy</h3>
+        </div>
+            <div id="media_detail">
+                Title: <span id="title_info"></span><br>
+                Episode Title: <span id="episode_title_info"></span><br>
+                Media Type: <span id="media_type_info"></span><br>
+                Series id: <span id="series_id"></span><br>
+                Season id: <span id="season_id"></span><br>
+                Episode id: <span id="episode_id"></span>
+            </div>
         </div>
     </body>
 </html>

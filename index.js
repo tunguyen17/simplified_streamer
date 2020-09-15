@@ -21,6 +21,10 @@ app.use('/index_style.css', function(req, res){
         res.sendFile(__basedir + '/views/index_style.css'); 
 });
 
+app.use('/script.js', function(req, res){
+        res.sendFile(__basedir + '/views/script.js'); 
+});
+
 // Make io accessible to our router
 app.use(function(req,res,next){
     req.db = db;
@@ -54,16 +58,29 @@ io.on('connection', function(socket){
         io.to(socket.id).emit("play", path);
     });
 
-    socket.on('load_series_season', function(series_id){
+    socket.on('load_seasons', function(series_id){
         //GOHERE1
-        let sql = `SELECT id, title FROM series_detail where series_id=${series_id}`;
+        let sql = `SELECT id, title FROM series_seasons where series_id=${series_id}`;
 
 	    db.all(sql, [], (err, rows) => {
 	        if (err) {
 	            throw err;
 	        }
 
-            io.to(socket.id).emit("query_res", rows);
+            io.to(socket.id).emit("seasons_query_res", rows);
+        });
+    });
+
+    socket.on('load_episodes', function(series_seasons_id){
+        //GOHERE1
+        let sql = `SELECT id, title FROM series_episodes where series_seasons_id=${series_seasons_id}`;
+
+	    db.all(sql, [], (err, rows) => {
+	        if (err) {
+	            throw err;
+	        }
+
+            io.to(socket.id).emit("episodes_query_res", rows);
         });
     });
 
@@ -105,8 +122,9 @@ io.on('connection', function(socket){
 	        if (err) {
 	            throw err;
 	        }
-
-            io.to(socket.id).emit("query_res", rows);
+            var query_res = {"media_type": media_type, "rows": rows}
+            console.log(query_res)
+            io.to(socket.id).emit("query_res", query_res);
         });
     });
     

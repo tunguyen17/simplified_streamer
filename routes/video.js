@@ -69,6 +69,7 @@ function readContent(path, request, response){
                     } else {
                         // CALLBACK read without range
                         pipeWithOutRange(path, fileSize, request, response);
+                        console.log("howdy ended");
                     }
                 }
             });
@@ -90,7 +91,7 @@ router.get('/:media_type/:id', function(req, res, next) {
 
     let media_type = req.params.media_type;
 
-    let db = media_type==="movies"?"movies":"series_detail";
+    let db = media_type==="movies"?"movies":"series_episodes";
 
     let sql = `SELECT file_path FROM ${db} WHERE id = ${req.params.id}`;
     
